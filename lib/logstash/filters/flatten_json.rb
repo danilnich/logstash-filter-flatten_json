@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "logstash/filters/base"
-require "logstash/namespace"
 
 # This filter will flatten json data into convenient strings, i.e.
 # Imagine you have json data (from mongodb or docker-stats, for example) and you
@@ -52,7 +51,12 @@ class LogStash::Filters::FlattenJson < LogStash::Filters::Base
 
     flatten_json = flatten(source, '')
     flatten_json.each do |key, value|
-      event.set(key, value)
+      # if field is @timestamp, adding prefix
+      if key.eql? "@timestamp"
+        event.set("parsed_timestamp", value)
+      else
+        event.set(key, value)
+      end
     end
 
     # filter_matched should go in the last line of our successful code
@@ -74,15 +78,13 @@ class LogStash::Filters::FlattenJson < LogStash::Filters::Base
           json.delete key
           json.merge! flatten(value, full_path)
         elsif json[key].is_a?(Array)
-          json[key].each_with_index do |item, index|
-            current_path = [full_path, index].join('.')
-            if item.is_a?(Hash)
-              json.merge! flatten(item, current_path)
-            else
-              json[current_path] = item
-            end
+          # if field is array, convert its values to a strings
+          arr_of_strs = []
+          json[key].each do |obj|
+            arr_of_strs.push(obj.to_s)
           end
           json.delete key
+          json[full_path] = arr_of_strs
         else
           value = json[key]
           json.delete key

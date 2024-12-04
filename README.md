@@ -32,9 +32,7 @@ the filter will enrich 'event' with following key-value pairs:
 key_1: "value_1"
 key_2: 2
 key_3.nested_key_1: "nested_value_1"
-key_3.nested_key_2.0: 1
-key_3.nested_key_2.1: 2
-key_3.nested_key_2.2: "a"
+key_3.nested_key_2: ["1", "2", "a"]
 ```
 
 This is very convenient if you have stats data from mongodb or docker-stats and you want to further process it or send to graphite server.
@@ -48,78 +46,31 @@ Logstash provides infrastructure to automatically generate documentation for thi
 
 Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
 
-## Installation from sources
-```bash
-wget https://github.com/mavlyutov/logstash-filter-flatten_json/releases/download/0.1.0/logstash-filter-flatten_json-0.1.0.gem
-/usr/share/logstash/bin/logstash-plugin install --no-verify logstash-filter-flatten_json-0.1.0.gem
+# Build
+
+```shell
+gem build logstash-filter-flatten_json.gemspec
 ```
 
-## Developing
+# Preparing the plugin for offline installation (without an Internet connection)
 
-### 1. Plugin Developement and Testing
-
-#### Code
-- To get started, you'll need JRuby with the Bundler gem installed.
-
-- Create a new plugin or clone and existing from the GitHub [logstash-plugins](https://github.com/logstash-plugins) organization. We also provide [example plugins](https://github.com/logstash-plugins?query=example).
-
-- Install dependencies
-```sh
-bundle install
+To do this, you will need logstash of the required version with an Internet connection.
+Execute the command:
+```shell
+bin/logstash-plugin install --no-verify ./logstash-filter-flatten_json-0.2.0.gem
 ```
 
-#### Test
-
-- Update your dependencies
-
-```sh
-bundle install
+```shell
+bin/logstash-plugin prepare-offline-pack logstash-filter-flatten_json
 ```
 
-- Run tests
+An archive will be created in the current directory, such as logstash-offline-plugins-8.6.1.zip
+This archive can be installed on logstashes without the Internet.
 
-```sh
-bundle exec rspec
+Important! The archive should be compiled on the same version of logstash as the target installation.
+
+# Installing offline plugins on logstash
+
+```shell
+logstash-plugin install file:///usr/share/logstash/logstash-offline-plugins-8.6.1.zip
 ```
-
-### 2. Running your unpublished Plugin in Logstash
-
-#### 2.1 Run in a local Logstash clone
-
-- Edit Logstash `Gemfile` and add the local plugin path, for example:
-```ruby
-gem "logstash-filter-awesome", :path => "/your/local/logstash-filter-awesome"
-```
-- Install plugin
-```sh
-bin/logstash-plugin install --no-verify
-```
-- Run Logstash with your plugin
-```sh
-bin/logstash -e 'filter {awesome {}}'
-```
-At this point any modifications to the plugin code will be applied to this local Logstash setup. After modifying the plugin, simply rerun Logstash.
-
-#### 2.2 Run in an installed Logstash
-
-You can use the same **2.1** method to run your plugin in an installed Logstash by editing its `Gemfile` and pointing the `:path` to your local plugin development directory or you can build the gem and install it using:
-
-- Build your plugin gem
-```sh
-gem build logstash-filter-awesome.gemspec
-```
-- Install the plugin from the Logstash home
-```sh
-bin/logstash-plugin install /your/local/plugin/logstash-filter-awesome.gem
-```
-- Start Logstash and proceed to test the plugin
-
-## Contributing
-
-All contributions are welcome: ideas, patches, documentation, bug reports, complaints, and even something you drew up on a napkin.
-
-Programming is not a required skill. Whatever you've seen about open source and maintainers or community members  saying "send patches or die" - you will not see that here.
-
-It is more important to the community that you are able to contribute.
-
-For more information about contributing, see the [CONTRIBUTING](https://github.com/elastic/logstash/blob/master/CONTRIBUTING.md) file.
