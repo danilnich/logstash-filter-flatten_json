@@ -72,5 +72,5 @@ Important! The archive should be compiled on the same version of logstash as the
 # Installing offline plugins on logstash
 
 ```shell
-logstash-plugin install file:///usr/share/logstash/logstash-offline-plugins-8.6.1.zip
+logstash-plugin install file://logstash-offline-plugins-8.6.1.zip
 ```
